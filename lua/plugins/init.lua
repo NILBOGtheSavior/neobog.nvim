@@ -9,10 +9,5 @@ return {
   require 'plugins.autopairs',
   require 'plugins.neo-tree',
   require 'plugins.gitsigns',
-  {
-    'numToStr/Comment.nvim',
-    opts = {
-      -- add any options here
-    },
-  },
+  require 'plugins.comments',
 }

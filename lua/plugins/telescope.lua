@@ -11,5 +11,13 @@ return {
 		{ "<leader>fb", "<cmd>Telescope buffers<CR>", desc = "Buffers" },
 		{ "<leader>fh", "<cmd>Telescope help_tags<CR>", desc = "Help tags" },
 		{ "<leader>fd", "<cmd>Telescope diagnostics<CR>", desc = "Diagnostics" },
+		{ "<leader>fs", "<cmd>Telescope builtin<CR>", desc = "Select" },
+	},
+	opts = {
+		pickers = {
+			colorscheme = {
+				enable_preview = true,
+			},
+		},
 	},
 }

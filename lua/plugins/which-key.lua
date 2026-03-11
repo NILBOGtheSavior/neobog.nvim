@@ -2,11 +2,17 @@ return {
 	"folke/which-key.nvim",
 	event = "VeryLazy",
 	opts = {
+		keys = {
+			scroll_down = "<c-n>",
+			scroll_up = "<c-b>",
+		},
+
 		spec = {
 			{ "<leader>f", group = "Telescope" },
 		},
 	},
 	keys = {
+
 		{
 			"?",
 			function()

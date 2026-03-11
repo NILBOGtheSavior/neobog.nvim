@@ -5,7 +5,19 @@ return {
 			ensure_installed = { "lua_ls" },
 		},
 		dependencies = {
-			{ "mason-org/mason.nvim", opts = {} },
+			{
+				"mason-org/mason.nvim",
+				opts = {
+					ui = {
+						border = "rounded",
+						icons = {
+							package_installed = "✓",
+							package_pending = "➜",
+							package_uninstalled = "✗",
+						},
+					},
+				},
+			},
 			"neovim/nvim-lspconfig",
 		},
 		config = function()
@@ -23,6 +35,7 @@ return {
 					},
 				},
 			}
+			require("mason-lspconfig").setup()
 		end,
 	},
 }

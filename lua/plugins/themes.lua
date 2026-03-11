@@ -7,7 +7,10 @@ return {
 	},
 	{
 		"catppuccin/nvim",
-		name = "catppuccin",
+		priority = 1000,
+	},
+	{
+		"shaunsingh/nord.nvim",
 		priority = 1000,
 	},
 }

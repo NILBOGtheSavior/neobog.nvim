@@ -4,3 +4,9 @@ vim.api.nvim_create_autocmd('TextYankPost', {
   callback = vim.highlight.on_yank,
 })
 
+vim.api.nvim_create_autocmd('OptionSet', {
+  pattern = 'background',
+  callback = function()
+    vim.cmd.colorscheme(vim.g.colors_name)
+  end,
+})

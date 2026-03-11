@@ -6,7 +6,7 @@ vim.opt.cursorline = true
 vim.opt.termguicolors = true
 vim.opt.signcolumn = "yes"
 vim.opt.list = true
-vim.opt.listchars = { tab = "> ", trail = "·", nbsp = "␣" }
+vim.opt.listchars = { tab = "» ", trail = "·", nbsp = "␣" }
 
 -- behavior
 vim.opt.mouse = "a"

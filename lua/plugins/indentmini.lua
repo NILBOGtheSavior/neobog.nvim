@@ -1,4 +1,4 @@
 return {
-	'nvimdev/indentmini.nvim',
-	lazy = true
+	"nvimdev/indentmini.nvim",
+	lazy = true,
 }

@@ -1,10 +1,14 @@
 return {
-	'stevearc/conform.nvim',
+	"stevearc/conform.nvim",
 	opts = {
+		format_on_save = {
+			timeout_ms = 500,
+			lsp_format = "fallback",
+		},
 		formatters_by_ft = {
 			lua = { "stylua" },
 			python = { "isort", "black" },
-			rust = { "rustfmt", lsp_format = "fallback" },
+			rust = { "rustfmt" },
 			javascript = { "prettierd", "prettier", stop_after_first = true },
 		},
 	},

@@ -23,7 +23,10 @@ return {
 				["<C-f>"] = cmp.mapping.scroll_docs(4),
 				["<C-Space>"] = cmp.mapping.complete(),
 				["<C-e>"] = cmp.mapping.abort(),
-				["<CR>"] = cmp.mapping.confirm({ select = true }),
+				["<C-j>"] = cmp.mapping.select_next_item({ behavior = cmp.SelectBehavior.Select }),
+				["<C-k>"] = cmp.mapping.select_prev_item({ behavior = cmp.SelectBehavior.Select }),
+				["<C-l>"] = cmp.mapping.confirm({ select = true }),
+				["<C-h>"] = cmp.mapping.abort(),
 			}),
 			sources = cmp.config.sources({
 				{ name = "lazydev", group_index = 0 },

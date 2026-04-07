@@ -1,6 +1,8 @@
+local prose_filetypes = { "markdown", "text" }
+
 return {
 	"nvim-lualine/lualine.nvim",
-	dependencies = { "nvim-tree/nvim-web-devicons" },
+	dependencies = { "nvim-tree/nvim-web-devicons", { "skwee357/nvim-prose" } },
 	opts = {
 		options = {
 			icons_enabled = true,
@@ -38,8 +40,21 @@ return {
 			lualine_a = { "mode" },
 			lualine_b = { "branch", "diff", "diagnostics" },
 			lualine_c = { "filename" },
-			lualine_x = { "encoding", "fileformat", "filetype" },
-			lualine_y = { "progress" },
+			lualine_x = { "encoding", "filetype" },
+			lualine_y = {
+				{
+					"prose_word_count",
+					cond = function()
+						return vim.tbl_contains(prose_filetypes, vim.bo.filetype)
+					end,
+				},
+				{
+					"progress",
+					cond = function()
+						return not vim.tbl_contains(prose_filetypes, vim.bo.filetype)
+					end,
+				},
+			},
 			lualine_z = { "location" },
 		},
 		inactive_sections = {
@@ -53,6 +68,5 @@ return {
 		tabline = {},
 		winbar = {},
 		inactive_winbar = {},
-		extensions = {},
 	},
 }

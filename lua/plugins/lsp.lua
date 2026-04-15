@@ -21,22 +21,6 @@ return {
 			},
 			"neovim/nvim-lspconfig",
 		},
-		config = function(_, opts)
-			require("mason").setup(opts.mason)
-			require("mason-lspconfig").setup(opts)
-			if vim.lsp.config then
-				vim.lsp.config("*", {
-					capabilities = require("cmp_nvim_lsp").default_capabilities(),
-				})
-			else
-				local lspconfig = require("lspconfig")
-				require("mason-lspconfig").setup_handlers({
-					function(server)
-						lspconfig[server].setup({})
-					end,
-				})
-			end
-		end,
 	},
 	{
 		"scalameta/nvim-metals",

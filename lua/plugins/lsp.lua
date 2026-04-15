@@ -3,6 +3,7 @@ return {
 		"mason-org/mason-lspconfig.nvim",
 		opts = {
 			ensure_installed = { "lua_ls" },
+			automatic_enable = true,
 		},
 		dependencies = {
 			{
@@ -20,12 +21,21 @@ return {
 			},
 			"neovim/nvim-lspconfig",
 		},
-		config = function()
-			local capabilities = vim.lsp.protocol.make_client_capabilities()
-			capabilities = vim.tbl_deep_extend("force", capabilities, require("cmp_nvim_lsp").default_capabilities())
-
-			local servers = {}
-			require("mason-lspconfig").setup()
+		config = function(_, opts)
+			require("mason").setup(opts.mason)
+			require("mason-lspconfig").setup(opts)
+			if vim.lsp.config then
+				vim.lsp.config("*", {
+					capabilities = require("cmp_nvim_lsp").default_capabilities(),
+				})
+			else
+				local lspconfig = require("lspconfig")
+				require("mason-lspconfig").setup_handlers({
+					function(server)
+						lspconfig[server].setup({})
+					end,
+				})
+			end
 		end,
 	},
 	{

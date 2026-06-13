@@ -10,6 +10,8 @@ vim.pack.add({
 
 	-- Navigation
 	"https://github.com/nvim-neo-tree/neo-tree.nvim",
+	"https://github.com/nvim-telescope/telescope-fzf-native.nvim",
+	"https://github.com/nvim-telescope/telescope.nvim",
 
 	-- UI
 	"https://github.com/nvim-lualine/lualine.nvim",
@@ -81,6 +83,19 @@ pack.setup({
 		packadd = { "lazydev.nvim", "blink.lib", "blink.cmp" },
 	},
 	{ mod = "ui", fn = "clue", event = { "UIEnter" }, packadd = { "which-key.nvim" } },
+	{
+		mod = "navigation",
+		fn = "telescope",
+		keys = {
+			{ "<leader>ff", desc = "Find files" },
+			{ "<leader>fg", desc = "Live grep" },
+			{ "<leader>fb", desc = "Buffers" },
+			{ "<leader>fh", desc = "Help tags" },
+			{ "<leader>fd", desc = "Diagnostics" },
+			{ "<leader>fs", desc = "Select" },
+		},
+		packadd = { "telescope.nvim", "telescope-fzf-native" },
+	},
 
 	-- On Call
 	{

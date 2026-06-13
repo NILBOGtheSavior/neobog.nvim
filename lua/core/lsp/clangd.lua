@@ -1,5 +1,5 @@
 return {
 	cmd = { "clangd" },
-	filetypes = { "c" },
+	filetypes = { "c", "cpp" },
 	root_markers = { "Makefile", "makefile", ".git" },
 }

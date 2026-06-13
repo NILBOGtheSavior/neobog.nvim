@@ -31,7 +31,7 @@ function M.setup()
 			)
 
 			-- Auto-format on save execution loop
-			if client and client.supports_method("textDocument/formatting") then
+			if client and client:supports_method("textDocument/formatting") then
 				vim.api.nvim_create_autocmd("BufWritePre", {
 					buffer = bufnr,
 					callback = function()
@@ -46,7 +46,7 @@ function M.setup()
 		library = { { path = "blink.cmp", words = { "blink" } } },
 	})
 
-	vim.lsp.enable({ "lua_ls" })
+	vim.lsp.enable({ "lua_ls", "clangd" })
 end
 
 return M

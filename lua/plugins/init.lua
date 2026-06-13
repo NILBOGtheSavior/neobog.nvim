@@ -9,27 +9,18 @@ vim.pack.add({
 
 	-- Formatting
 	"https://github.com/windwp/nvim-autopairs",
+	"https://github.com/stevearc/conform.nvim",
 
 	-- Navigation
 	"https://github.com/nvim-neo-tree/neo-tree.nvim",
 
 	-- UI
 	"https://github.com/nvim-lualine/lualine.nvim",
-}, { confirm = false, load = function() end })
 
--- =============================================================================
--- Fields:
---   {
---  mod     = 'domain_file', -- e.g., 'ui' (maps to lua/plugins/ui.lua)
---  fn      = 'function',    -- (Optional) e.g., 'which_key' (calls M.which_key())
---  packadd = { 'plugin' },  -- Array of plugin dir names to :packadd before loading
--- Trigger (choose ONE):
---  event   = 'UIEnter',     -- Autocmd event(s) (string or array)
---  pattern = {'*.rs'},      -- (Optional) autocmd pattern; nil means all files
---  keys    = { ... },       -- Array of { '<leader>x', desc = '...', mode = 'n' }
---  defer   = 1,             -- Milliseconds to delay via vim.defer_fn
--- }
--- =============================================================================
+	-- Utils
+    "https://github.com/saghen/blink.lib",
+	"https://github.com/Saghen/blink.cmp",
+}, { confirm = false, load = function() end })
 
 local pack = require("core.pack")
 
@@ -45,6 +36,15 @@ pack.setup({
 		packadd = { "lualine.nvim", "nvim-web-devicons", "nvim-prose" },
 	},
 
+	-- On Keystroke
+	{
+		mod = "formatting",
+		fn = "autopairs",
+		event = { "InsertEnter", "CmdlineEnter" },
+		packadd = { "nvim-autopairs" },
+	},
+	{ mod = "completion", event = { "InsertEnter", "CmdlineEnter" }, packadd = { "blink.lib", "blink.cmp" } },
+
 	-- On Call
 	{
 		mod = "navigation",
@@ -52,4 +52,7 @@ pack.setup({
 		event = "UIEnter",
 		packadd = { "neo-tree.nvim", "nui.nvim", "plenary.nvim" },
 	},
+
+	-- On Save
+	{ mod = "formatting", fn = "conform", event = "BufWritePre", packadd = { "conform.nvim" } },
 })

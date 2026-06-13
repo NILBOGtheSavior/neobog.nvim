@@ -1,9 +1,19 @@
+-- ====================================
+-- = NILBOG's Neovim Config           =
+-- ====================================
+
+if vim.loader then
+	vim.loader.enable()
+end
+
 vim.g.mapleader = " "
 vim.g.maplocalleader = " "
 
 require("config.options")
 require("config.keymaps")
 require("config.autocmds")
-require("config.lazy")
+-- require("config.lazy")
 
-vim.cmd.colorscheme("tokyonight")
+require("plugins")
+
+-- vim.cmd.colorscheme("tokyonight")

@@ -1,5 +1,16 @@
 require("blink.cmp").setup({
-	keymap = { preset = "default" },
+	keymap = {
+		preset = "none",
+		["<C-b>"] = { "scroll_documentation_up", "fallback" },
+		["<C-f>"] = { "scroll_documentation_down", "fallback" },
+		["<C-Space>"] = { "show", "show_documentation", "hide_documentation" },
+		["<C-e>"] = { "hide", "fallback" },
+		["<C-j>"] = { "select_next", "fallback" },
+		["<C-k>"] = { "select_prev", "fallback" },
+		["<C-l>"] = { "accept", "fallback" },
+		["<C-h>"] = { "hide", "fallback" },
+		["<C-u>"] = { "show_signature", "hide_signature", "fallback" },
+	},
 	appearance = {
 		nerd_font_variant = "mono",
 		kind_icons = {

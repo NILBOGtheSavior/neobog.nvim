@@ -22,3 +22,7 @@ vim.api.nvim_create_autocmd("FileType", {
 		vim.opt_local.softtabstop = 2
 	end,
 })
+
+vim.api.nvim_create_user_command("PackUpdate", function()
+	require("core.pack").update()
+end, {})

@@ -49,6 +49,9 @@ _G.theme_colors = {
 	get_active_theme = function()
 		return get_active_theme_name()
 	end,
+	get_palette = function()
+		return palettes[get_active_theme_name()]
+	end,
 	get_theme_based_value = function(dark_val, light_val)
 		return get_active_theme_name() == "dark" and dark_val or light_val
 	end,
@@ -104,8 +107,8 @@ function M.apply_theme(theme_name)
 
 	-- Generic Code Syntax Architecture
 	hi("Constant", { fg = p.magenta })
-	hi("String", { fg = p.cyan })
-	hi("Character", { fg = p.cyan })
+	hi("String", { fg = p.cursor })
+	hi("Character", { fg = p.cursor })
 	hi("Number", { fg = p.magenta })
 	hi("Boolean", { fg = p.magenta, bold = true })
 	hi("Float", { fg = p.magenta })

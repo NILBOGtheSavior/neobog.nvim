@@ -1,20 +1,10 @@
--- =============================================================================
--- Declarative plugin loading engine for vim.pack
--- Engine manages :packadd (adding to runtimepath + sourcing plugin/) so that
--- vim.pack.add can use load = function() end (no-op) to skip runtimepath entirely.
--- =============================================================================
-
 local M = {}
 
--- Track loaded modules (one-time guard, same role as old core.lazy.setup)
 local loaded = {}
-
--- Track packadd'd plugin directory names (deduplication)
 local packadded = {}
 
---- Idempotent :packadd helper.
--- Adds plugin directory to runtimepath AND sources its plugin/ files.
--- Deduplicated via packadded table.
+local pack_dir = vim.fn.stdpath("data") .. "/site/pack/core/opt/"
+
 local function packadd(name)
 	if not packadded[name] then
 		packadded[name] = true
@@ -22,7 +12,6 @@ local function packadd(name)
 	end
 end
 
---- Load a single registry entry: packadd declared plugins, then require the module.
 local function load_entry(entry)
 	local load_key = entry.fn and (entry.mod .. "." .. entry.fn) or entry.mod
 	if loaded[load_key] then
@@ -54,61 +43,141 @@ local function load_entry(entry)
 	end
 end
 
---- Set up the loading engine.
--- @param registry  Array of entry tables:
---   { mod = 'name', event = 'Event', pattern = {...}, keys = {...}, defer = ms, packadd = {...}, once }
---   - event:   autocmd event string or array; creates one-shot autocmd (default once=true)
---   - pattern: autocmd pattern string or array (e.g. {'*.rs'}); defaults to all files
---   - keys:    array of { keystring, desc, mode }; sets temp keymap, loads on first press
---   - defer:   milliseconds; uses vim.defer_fn
---   - packadd: array of plugin directory names; :packadd each before require
---   - once:    for event entries; default true (load once then stop listening)
 function M.setup(registry)
 	for _, entry in ipairs(registry) do
 		if entry.event then
-			-- Event-triggered loading (UIEnter, BufReadPre, InsertEnter, BufWritePre, etc.)
 			local events = type(entry.event) == "table" and entry.event or { entry.event }
 			local group_name = "pack-" .. entry.mod .. (entry.fn and ("-" .. entry.fn) or "")
 			local group = vim.api.nvim_create_augroup(group_name, { clear = true })
 			vim.api.nvim_create_autocmd(events, {
 				group = group,
-				pattern = entry.pattern, -- nil means '*' (all files); specify e.g. {'*.rs'} to restrict
-				once = entry.once ~= false, -- default true; set once=false for repeatable events like BufWritePre
+				pattern = entry.pattern,
+				once = entry.once ~= false,
 				callback = function()
 					load_entry(entry)
 				end,
 			})
 		elseif entry.keys then
-			-- Keymap-triggered loading: set a temp keymap, on first press load then replay.
 			for _, k in ipairs(entry.keys) do
 				local key = k[1]
 				local desc = k.desc or ("Load " .. entry.mod)
 				local mode = k.mode or "n"
 				vim.keymap.set(mode, key, function()
-					-- Remove the temp keymap so it doesn't fire again
 					pcall(vim.keymap.del, mode, key)
-					-- Load the module (which may register the "real" keymap)
 					load_entry(entry)
-					-- Replay the original keypress so the now-loaded plugin handles it
 					local keys = vim.api.nvim_replace_termcodes(key, true, false, true)
 					vim.api.nvim_feedkeys(keys, "mit", false)
 				end, { desc = desc, nowait = true })
 			end
 		elseif entry.defer then
-			-- Deferred loading (vim.defer_fn)
 			vim.defer_fn(function()
 				load_entry(entry)
 			end, entry.defer)
 		else
-			-- Immediate loading (catppuccin on startup)
 			load_entry(entry)
 		end
 	end
 end
 
---- Returns list of loaded module names (for debugging)
 function M.loaded()
 	return vim.tbl_keys(loaded)
+end
+
+function M.update()
+	local buf = vim.api.nvim_create_buf(false, true)
+	local width = math.floor(vim.o.columns * 0.65)
+	local height = math.floor(vim.o.lines * 0.65)
+
+	local win = vim.api.nvim_open_win(buf, true, {
+		relative = "editor",
+		width = width,
+		height = height,
+		col = math.floor((vim.o.columns - width) / 2),
+		row = math.floor((vim.o.lines - height) / 2),
+		style = "minimal",
+		border = "single",
+		title = "󰏕 Package Updater ",
+		title_pos = "center",
+	})
+
+	vim.api.nvim_buf_set_lines(buf, 0, -1, false, { "Searching for updates...", "" })
+
+	local handle = vim.uv.fs_scandir(pack_dir)
+	if not handle then
+		vim.api.nvim_buf_set_lines(buf, -1, -1, false, { "❌ Directory tracking failed: " .. pack_dir })
+		return
+	end
+
+	local plugins = {}
+	while true do
+		local name, fs_type = vim.uv.fs_scandir_next(handle)
+		if not name then
+			break
+		end
+		if fs_type == "directory" then
+			table.insert(plugins, name)
+		end
+	end
+
+	if #plugins == 0 then
+		vim.api.nvim_buf_set_lines(buf, -1, -1, false, { "Zero plugins detected in package folder targets." })
+		return
+	end
+
+	local completed = 0
+	for _, plugin in ipairs(plugins) do
+		local path = pack_dir .. plugin
+
+		vim.fn.jobstart({
+			"sh",
+			"-c",
+			"git fetch origin --tags -q && "
+				.. "BRANCH=$(git branch -r | grep -oE 'origin/(main|master|trunk)$' | head -n1 | sed 's|origin/||') && "
+				.. '[ -n "$BRANCH" ] && git reset --hard "origin/$BRANCH"',
+		}, {
+			cwd = path,
+			stdout_buffered = true,
+			on_stdout = function(_, data)
+				if data and #data > 0 then
+					local lines = {}
+					for _, line in ipairs(data) do
+						if line ~= "" and not line:match("HEAD is now at") then
+							table.insert(lines, "  " .. line)
+						end
+					end
+					if #lines > 0 then
+						table.insert(lines, 1, " [" .. plugin .. "]:")
+						vim.api.nvim_buf_set_lines(buf, -1, -1, false, lines)
+					end
+				end
+			end,
+			on_stderr = function(_, data)
+				if data and #data > 0 then
+					local errors = {}
+					for _, line in ipairs(data) do
+						if
+							line ~= ""
+							and not line:match("From ")
+							and not line:match("%* branch")
+							and not line:match("Fetching")
+						then
+							table.insert(errors, "⚠️ [" .. plugin .. "]: " .. line)
+						end
+					end
+					if #errors > 0 then
+						vim.api.nvim_buf_set_lines(buf, -1, -1, false, errors)
+					end
+				end
+			end,
+			on_exit = function(_, exit_code)
+				completed = completed + 1
+				if completed == #plugins then
+					vim.api.nvim_buf_set_lines(buf, -1, -1, false, { "", "󱝍  Neovim is up to date." })
+				end
+			end,
+		})
+	end
+	vim.keymap.set("n", "q", "<cmd>close<CR>", { buffer = buf, silent = true })
 end
 
 return M

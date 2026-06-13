@@ -1,12 +1,35 @@
 local M = {}
 
 local prose_filetypes = { "markdown", "text" }
+local p = _G.theme_colors.get_palette()
 
 function M.statusline()
 	require("lualine").setup({
 		options = {
 			icons_enabled = true,
-			theme = "auto",
+			theme = {
+				normal = {
+					a = { fg = p.bg, bg = p.green, bold = true },
+					b = { fg = p.fg, bg = p.alt_bg },
+					c = { fg = p.fg, bg = p.bg },
+					z = { fg = p.bg, bg = p.green, bold = true },
+				},
+				insert = { a = { fg = p.bg, bg = p.blue, bold = true }, z = { fg = p.bg, bg = p.green, bold = true } },
+				visual = {
+					a = { fg = p.bg, bg = p.magenta, bold = true },
+					z = { fg = p.bg, bg = p.green, bold = true },
+				},
+				replace = { a = { fg = p.bg, bg = p.red, bold = true }, z = { fg = p.bg, bg = p.green, bold = true } },
+				command = {
+					a = { fg = p.bg, bg = p.yellow, bold = true },
+					z = { fg = p.bg, bg = p.green, bold = true },
+				},
+				inactive = {
+					a = { fg = p.dim_blue, bg = p.alt_bg },
+					b = { fg = p.dim_blue, bg = p.alt_bg },
+					c = { fg = p.dim_blue, bg = p.bg },
+				},
+			},
 			component_separators = { left = "", right = "" },
 			section_separators = { left = "", right = "" },
 			disabled_filetypes = {

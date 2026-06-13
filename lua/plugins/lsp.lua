@@ -57,23 +57,21 @@ function M.setup()
 		})
 	end
 
-	local lsp_dir = vim.fn.stdpath("config") .. "/lsp"
+	local lsp_dir = vim.fn.stdpath("config") .. "/lua/core/lsp"
 	local enabled_servers = {}
 
 	local handle = vim.uv.fs_scandir(lsp_dir)
 	if handle then
 		while true do
-			local name, type = vim.uv.fs_scandir_next(handle)
+			local name, fs_type = vim.uv.fs_scandir_next(handle)
 			if not name then
 				break
-			end -- Exit when out of files
+			end
 
-			if type == "file" and name:match("%.lua$") then
+			if fs_type == "file" and name:match("%.lua$") then
 				local server_name = name:gsub("%.lua$", "")
 
-				-- Require the individual file config (e.g., lsp/clangd.lua)
-				-- and dynamically attach it to Neovim's LSP config table
-				local has_opts, opts = pcall(require, "lsp." .. server_name)
+				local has_opts, opts = pcall(require, "core.lsp." .. server_name)
 				if has_opts and type(opts) == "table" then
 					vim.lsp.config[server_name] = opts
 				end

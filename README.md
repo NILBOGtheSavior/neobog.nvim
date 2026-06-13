@@ -38,10 +38,9 @@ git clone https://github.com/NILBOGtheSavior/neobog.nvim.git "${XDG_CONFIG_HOME:
 
 ### 2. Define the server config
 
-1. Create a new file for your LSP in `lsp/<lsp-name>.lua`.
+1. Create a new file for your LSP in `core/lsp/<lsp-name>.lua`.
 2. Find the definition spec in `:help lsp-handler`.
 3. Define the parameters based on the LSP JSON specification.
-4. Add the LSP to the list in `plugins/lsp.lua`.
 
 ## Plugins to add
 

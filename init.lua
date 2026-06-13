@@ -9,8 +9,8 @@ end
 vim.g.mapleader = " "
 vim.g.maplocalleader = " "
 
-require("config.options")
-require("config.keymaps")
-require("config.autocmds")
+require("core.options")
+require("core.keymaps")
+require("core.autocmds")
 
 require("plugins")

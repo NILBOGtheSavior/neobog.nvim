@@ -42,11 +42,50 @@ function M.setup()
 		end,
 	})
 
+	-- Library enhancements
+
 	require("lazydev").setup({
 		library = { { path = "blink.cmp", words = { "blink" } } },
 	})
 
-	vim.lsp.enable({ "lua_ls", "clangd" })
+	-- Blink.cmp integration
+
+	local has_blink, blink = pcall(require, "blink.cmp")
+	if has_blink then
+		vim.lsp.config("*", {
+			capabilities = blink.get_lsp_capabilities(),
+		})
+	end
+
+	local lsp_dir = vim.fn.stdpath("config") .. "/lsp"
+	local enabled_servers = {}
+
+	local handle = vim.uv.fs_scandir(lsp_dir)
+	if handle then
+		while true do
+			local name, type = vim.uv.fs_scandir_next(handle)
+			if not name then
+				break
+			end -- Exit when out of files
+
+			if type == "file" and name:match("%.lua$") then
+				local server_name = name:gsub("%.lua$", "")
+
+				-- Require the individual file config (e.g., lsp/clangd.lua)
+				-- and dynamically attach it to Neovim's LSP config table
+				local has_opts, opts = pcall(require, "lsp." .. server_name)
+				if has_opts and type(opts) == "table" then
+					vim.lsp.config[server_name] = opts
+				end
+
+				table.insert(enabled_servers, server_name)
+			end
+		end
+	end
+
+	if #enabled_servers > 0 then
+		vim.lsp.enable(enabled_servers)
+	end
 end
 
 return M

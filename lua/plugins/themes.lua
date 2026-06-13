@@ -1,227 +1,194 @@
--- Catppuccin colorscheme
+local M = {}
 
-local themes = {
-	latte = { flavour = "latte", background = "light" },
-	mocha = {
-		flavour = "mocha",
-		background = "dark",
-		color_overrides = {
-			mocha = {
-				base = "#181825",
-				mantle = "#11111b",
-				surface0 = "#2a2a37",
-				lavender = "#b4befe",
-				green = "#a6e3a1",
-				mauve = "#cba6f7",
-				peach = "#fab387",
-			},
-		},
+local palettes = {
+	dark = {
+		bg = "#1D2230", -- Deep Navy
+		fg = "#a5a296", -- Muted Stone
+		alt_bg = "#282e3f", -- Mantle / Surface
+		sel_bg = "#a5a296", -- Selection Highlight
+		sel_fg = "#1D2230",
+		cursor = "#80a961", -- Sage Green
+
+		-- ANSI 16 Matchers
+		red = "#c46b6b",
+		green = "#80a961",
+		yellow = "#D9B36C",
+		blue = "#7489ab",
+		dim_blue = "#668799",
+		magenta = "#7E6BC4",
+		cyan = "#5e8d8d",
+		alt_cyan = "#7ba2a2",
+		bright_fg = "#EAE6DA",
+	},
+	light = {
+		bg = "#EAE6DA", -- Parchment White
+		fg = "#394260", -- Ink Blue
+		alt_bg = "#dcd8ca", -- Dim Parchment
+		sel_bg = "#394260", -- Selection Highlight
+		sel_fg = "#EAE6DA",
+		cursor = "#394260", -- Ink Blue Focus
+
+		-- ANSI 16 Matchers
+		red = "#a14d4d",
+		green = "#5a7a41",
+		yellow = "#a68546",
+		blue = "#7489ab",
+		dim_blue = "#668799",
+		magenta = "#5e4da1",
+		cyan = "#5e8d8d",
+		alt_cyan = "#7ba2a2",
+		bright_fg = "#1D2230",
 	},
 }
 
 local function get_active_theme_name()
-	return vim.g.current_color_theme or "mocha"
+	return vim.g.current_color_theme or "dark"
 end
 
-local function set_active_theme(theme_name)
-	vim.g.current_color_theme = theme_name
-	vim.schedule(function()
-		if vim.v.this_session ~= "" then
-			vim.cmd("mksession!")
-		end
-	end)
-end
-
-local theme_colors = {
+_G.theme_colors = {
 	get_active_theme = function()
 		return get_active_theme_name()
 	end,
-
-	get_theme_based_value = function(mocha_value, latte_value)
-		return get_active_theme_name() == "mocha" and mocha_value or latte_value
+	get_theme_based_value = function(dark_val, light_val)
+		return get_active_theme_name() == "dark" and dark_val or light_val
 	end,
-
 	get_badge_colors = function(component)
-		local is_mocha = get_active_theme_name() == "mocha"
+		local is_dark = get_active_theme_name() == "dark"
+		local p = palettes[is_dark and "dark" or "light"]
 		if component == "theme" then
-			return is_mocha and { fg = "#11111b", bg = "#b4befe", bold = true }
-				or { fg = "#4c4f69", bg = "#f5c2e7", bold = true }
+			return { fg = p.bg, bg = p.blue, bold = true }
 		else
-			return is_mocha and { fg = "#11111b", bg = "#a6e3a1", bold = true }
-				or { fg = "#eff1f5", bg = "#8839ef", bold = true }
+			return { fg = p.bg, bg = p.green, bold = true }
 		end
 	end,
 }
 
-_G.theme_colors = theme_colors
+function M.apply_theme(theme_name)
+	if not palettes[theme_name] then
+		return
+	end
+	vim.g.current_color_theme = theme_name
 
-local function toggle_between_themes()
-	local current = get_active_theme_name()
-	local new_theme = current == "latte" and "mocha" or "latte"
-	set_active_theme(new_theme)
+	local p = palettes[theme_name]
+	vim.opt.background = theme_name
 
-	local theme_config = themes[new_theme]
-	vim.opt.background = theme_config.background
+	-- Clear out old highlight profiles safely
+	vim.cmd("hi clear")
+	if vim.fn.exists("syntax_on") then
+		vim.cmd("syntax reset")
+	end
+	vim.g.colors_name = "bogos-" .. theme_name
 
-	require("catppuccin").setup({
-		flavour = theme_config.flavour,
-		term_colors = false,
-		color_overrides = theme_config.color_overrides,
-	})
+	-- Helper closure to rapidly assign Vim namespaces
+	local hi = function(group, opts)
+		vim.api.nvim_set_hl(0, group, opts)
+	end
 
-	vim.cmd("colorscheme catppuccin")
+	-- Core Vim Text Layers
+	hi("Normal", { fg = p.fg, bg = p.bg })
+	hi("NormalFloat", { fg = p.fg, bg = p.alt_bg })
+	hi("Comment", { fg = p.dim_blue, italic = true })
+	hi("CursorLine", { bg = p.alt_bg })
+	hi("CursorColumn", { bg = p.alt_bg })
+	hi("ColorColumn", { bg = p.alt_bg })
+	hi("Visual", { fg = p.sel_fg, bg = p.sel_bg })
+	hi("Search", { fg = p.bg, bg = p.yellow, bold = true })
+	hi("IncSearch", { fg = p.bg, bg = p.cursor, bold = true })
 
-	-- Reapply terminal colors (Catppuccin term_colors reset them)
-	vim.g.terminal_color_0 = "#5c5f77"
-	vim.g.terminal_color_1 = "#d20f39"
-	vim.g.terminal_color_2 = "#40a02b"
-	vim.g.terminal_color_3 = "#df8e1d"
-	vim.g.terminal_color_4 = "#1e66f5"
-	vim.g.terminal_color_5 = "#8839ef"
-	vim.g.terminal_color_6 = "#179299"
-	vim.g.terminal_color_7 = "#7c7f93" -- overlay2 (darker)
-	vim.g.terminal_color_8 = "#6c6f85"
-	vim.g.terminal_color_9 = "#d20f39"
-	vim.g.terminal_color_10 = "#40a02b"
-	vim.g.terminal_color_11 = "#fe640b" -- peach (darker)
-	vim.g.terminal_color_12 = "#1e66f5"
-	vim.g.terminal_color_13 = "#8839ef"
-	vim.g.terminal_color_14 = "#179299"
-	vim.g.terminal_color_15 = "#4c4f69"
+	-- Borders and Dividers
+	hi("WinSeparator", { fg = p.alt_bg, bg = p.bg })
+	hi("LineNr", { fg = p.alt_bg })
+	hi("CursorLineNr", { fg = p.cursor, bold = true })
+	hi("FloatBorder", { fg = p.alt_bg, bg = p.alt_bg })
+	hi("FloatTitle", { fg = p.blue, bg = p.alt_bg, bold = true })
 
+	-- Generic Code Syntax Architecture
+	hi("Constant", { fg = p.magenta })
+	hi("String", { fg = p.cyan })
+	hi("Character", { fg = p.cyan })
+	hi("Number", { fg = p.magenta })
+	hi("Boolean", { fg = p.magenta, bold = true })
+	hi("Float", { fg = p.magenta })
+
+	hi("Identifier", { fg = p.bright_fg })
+	hi("Function", { fg = p.blue, bold = true })
+	hi("Statement", { fg = p.green, bold = true })
+	hi("Conditional", { fg = p.green, italic = true, bold = true })
+	hi("Repeat", { fg = p.green, bold = true })
+	hi("Label", { fg = p.blue })
+	hi("Operator", { fg = p.fg })
+	hi("Keyword", { fg = p.green, bold = true })
+	hi("Exception", { fg = p.red, bold = true })
+
+	hi("PreProc", { fg = p.magenta })
+	hi("Type", { fg = p.yellow, italic = true })
+	hi("Structure", { fg = p.yellow, bold = true })
+	hi("Special", { fg = p.alt_cyan })
+	hi("Todo", { fg = p.bg, bg = p.yellow, bold = true })
+
+	-- TreeSitter Token Shims
+	hi("@variable", { fg = p.fg })
+	hi("@variable.builtin", { fg = p.red, italic = true })
+	hi("@keyword", { link = "Keyword" })
+	hi("@function", { link = "Function" })
+	hi("@comment", { link = "Comment" })
+	hi("@constant", { link = "Constant" })
+
+	-- UI Component Interventions (Blink, Telescope, Neo-tree)
+	hi("BlinkCmpMenu", { bg = p.alt_bg, fg = p.fg })
+	hi("BlinkCmpMenuBorder", { fg = p.alt_bg, bg = p.alt_bg })
+	hi("BlinkCmpMenuSelection", { bg = p.sel_bg, fg = p.sel_fg, bold = true })
+	hi("BlinkCmpDoc", { bg = p.alt_bg, fg = p.fg })
+	hi("BlinkCmpDocBorder", { fg = p.alt_bg, bg = p.alt_bg })
+	hi("BlinkCmpSignatureHelp", { bg = p.alt_bg, fg = p.fg })
+	hi("BlinkCmpSignatureHelpBorder", { fg = p.alt_bg, bg = p.alt_bg })
+
+	hi("TelescopeNormal", { bg = p.alt_bg, fg = p.fg })
+	hi("TelescopeBorder", { fg = p.alt_bg, bg = p.alt_bg })
+	hi("TelescopeSelection", { bg = p.bg, fg = p.bright_fg, bold = true })
+	hi("TelescopeMatching", { fg = p.cursor, bold = true })
+
+	hi("NeoTreeNormal", { bg = p.alt_bg, fg = p.fg })
+	hi("NeoTreeNormalNC", { bg = p.alt_bg, fg = p.fg })
+	hi("NeoTreeWinSeparator", { fg = p.bg, bg = p.bg })
+
+	hi("IblIndent", { fg = p.alt_bg })
+	hi("IblScope", { fg = p.dim_blue })
+
+	-- Native Terminal Grid Pipeline Mapping
+	vim.g.terminal_color_0 = p.bg
+	vim.g.terminal_color_8 = p.alt_bg
+	vim.g.terminal_color_1 = p.red
+	vim.g.terminal_color_9 = p.red
+	vim.g.terminal_color_2 = p.green
+	vim.g.terminal_color_10 = p.green
+	vim.g.terminal_color_3 = p.yellow
+	vim.g.terminal_color_11 = p.yellow
+	vim.g.terminal_color_4 = p.blue
+	vim.g.terminal_color_12 = p.dim_blue
+	vim.g.terminal_color_5 = p.magenta
+	vim.g.terminal_color_13 = p.magenta
+	vim.g.terminal_color_6 = p.cyan
+	vim.g.terminal_color_14 = p.alt_cyan
+	vim.g.terminal_color_7 = p.fg
+	vim.g.terminal_color_15 = p.bright_fg
+
+	-- Hot-reload connected plugins
 	if package.loaded["lualine"] then
 		require("lualine").reset_highlights()
-		vim.cmd("redrawstatus")
 	end
+	vim.cmd("redraw!")
 end
 
-_G.toggle_color_theme = toggle_between_themes
+-- Expose simple global toggle for manual user manipulation
+_G.toggle_color_theme = function()
+	local next_map = { dark = "light", light = "dark" }
+	M.apply_theme(next_map[get_active_theme_name()])
+end
 
--- UI tweaks
 vim.opt.shortmess:append("q")
 
-local current_theme = get_active_theme_name()
-local theme_config = themes[current_theme]
+-- Defaults straight to BogOS Dark variant on launch
+M.apply_theme("dark")
 
-vim.opt.background = theme_config.background
-
-require("catppuccin").setup({
-	flavour = theme_config.flavour,
-	term_colors = false,
-	dim_inactive = {
-		enabled = true,
-		shade = current_theme == "latte" and "light" or "dark",
-		percentage = 0.12,
-	},
-	color_overrides = theme_config.color_overrides,
-	styles = {
-		comments = { "italic" },
-		conditionals = { "italic" },
-		functions = { "bold" },
-		keywords = { "bold" },
-		types = { "italic" },
-	},
-	integrations = {
-		cmp = true,
-		gitsigns = true,
-		neo_tree = true,
-		treesitter = true,
-		treesitter_context = true,
-		notify = true,
-		mason = true,
-		telescope = { enabled = true, style = "nvchad" },
-		which_key = true,
-		flash = true,
-		lsp_trouble = true,
-		indent_blankline = { enabled = true, scope_color = "lavender" },
-		dap = { enabled = true, enable_ui = true },
-		render_markdown = true,
-		blink_cmp = true,
-		neotest = true,
-	},
-	custom_highlights = function(colors)
-		return {
-			CursorLine = { bg = colors.surface0 },
-			CursorColumn = { bg = colors.surface0 },
-			ColorColumn = { bg = colors.surface0 },
-			WinSeparator = { fg = colors.overlay0, bg = colors.base },
-			Folded = { style = { "italic", "bold" } },
-			LineNr = { fg = colors.overlay0 },
-			CursorLineNr = { fg = colors.mauve, style = { "bold" } },
-			NormalFloat = { bg = colors.mantle, fg = colors.text, blend = 10 },
-			FloatBorder = { bg = colors.mantle, fg = colors.overlay0, blend = 8 },
-			FloatTitle = { bg = colors.mantle, fg = colors.lavender, style = { "bold" }, blend = 8 },
-			FloatFooter = { bg = colors.mantle, fg = colors.overlay0, style = { "italic" }, blend = 8 },
-			DiagnosticHint = { fg = colors.teal },
-			IblIndent = { fg = colors.surface0 },
-			IblScope = { fg = colors.surface2 },
-			CmpMenu = { bg = colors.mantle, fg = colors.text, blend = 10 },
-			CmpMenuBorder = { bg = colors.mantle, fg = colors.overlay0, blend = 8 },
-			CmpMenuSel = { bg = colors.surface0, fg = colors.text, style = { "bold" } },
-			CmpDocumentation = { bg = colors.mantle, fg = colors.text, blend = 10 },
-			CmpDocumentationBorder = { bg = colors.mantle, fg = colors.overlay0, blend = 8 },
-			CmpDocumentationCursorLine = { bg = colors.surface0 },
-			CmpSignatureHelp = { bg = colors.mantle, fg = colors.text, blend = 10 },
-			CmpSignatureHelpBorder = { bg = colors.mantle, fg = colors.overlay0, blend = 8 },
-			LspReferenceText = { bg = colors.surface1, style = { "bold" } },
-			LspReferenceRead = { bg = colors.surface1, style = { "bold" } },
-			LspReferenceWrite = { bg = colors.peach, fg = colors.base, style = { "bold" } },
-			TelescopeNormal = { bg = colors.mantle, fg = colors.text, blend = 10 },
-			TelescopeBorder = { bg = colors.mantle, fg = colors.overlay0, blend = 8 },
-			TelescopeTitle = { bg = colors.lavender, fg = colors.mantle, style = { "bold" }, blend = 8 },
-			TelescopeSelection = { bg = colors.surface0, fg = colors.text, style = { "bold" } },
-			TelescopeSelectionCaret = { fg = colors.flamingo },
-			TelescopeMatching = { fg = colors.blue, style = { "bold" } },
-			TelescopePromptPrefix = { fg = colors.flamingo },
-			TelescopePromptCounter = { fg = colors.overlay1 },
-			WhichKey = { fg = colors.lavender, style = { "bold" } },
-			WhichKeyGroup = { fg = colors.lavender },
-			WhichKeyDesc = { fg = colors.lavender },
-			WhichKeySeparator = { fg = colors.overlay1 },
-			WhichKeyFloat = { bg = colors.mantle, blend = 10 },
-			WhichKeyBorder = { bg = colors.mantle, fg = colors.overlay0, blend = 8 },
-			NeoTreeNormal = { bg = colors.mantle, fg = colors.text },
-			NeoTreeNormalNC = { bg = colors.mantle, fg = colors.text },
-			NeoTreeWinSeparator = { bg = colors.base, fg = colors.base },
-			NeoTreeFloatBorder = { bg = colors.mantle, fg = colors.overlay0, blend = 8 },
-			NeoTreeFloatTitle = { bg = colors.mantle, fg = colors.lavender, style = { "bold" }, blend = 8 },
-			MasonNormal = { bg = colors.mantle, fg = colors.text, blend = 10 },
-			MasonHeader = { bg = colors.blue, fg = colors.mantle, style = { "bold" } },
-			MasonHeaderSecondary = { bg = colors.lavender, fg = colors.mantle, style = { "bold" } },
-			MasonHighlight = { fg = colors.blue },
-			MasonHighlightBlock = { bg = colors.blue, fg = colors.mantle },
-			MasonHighlightBlockBold = { bg = colors.blue, fg = colors.mantle, style = { "bold" } },
-			MasonHighlightSecondary = { fg = colors.lavender },
-			MasonHighlightBlockSecondary = { bg = colors.lavender, fg = colors.mantle },
-			MasonHighlightBlockBoldSecondary = { bg = colors.lavender, fg = colors.mantle, style = { "bold" } },
-			MasonMuted = { fg = colors.overlay1 },
-			MasonMutedBlock = { bg = colors.overlay1, fg = colors.mantle },
-			MasonMutedBlockBold = { bg = colors.overlay1, fg = colors.mantle, style = { "bold" } },
-			["@variable.angular"] = { fg = colors.mauve, style = { "italic" } },
-			NeotestPassed = { fg = colors.green, style = { "bold" } },
-			NeotestFailed = { fg = colors.red, style = { "bold" } },
-			NeotestRunning = { fg = colors.yellow, style = { "bold" } },
-			NeotestSkipped = { fg = colors.blue, style = { "bold" } },
-		}
-	end,
-})
-vim.cmd.colorscheme("catppuccin")
-
--- Terminal color palette — Catppuccin Latte (light-background compatible)
--- Set AFTER colorscheme so Catppuccin's compiled term_colors takes a back seat.
-vim.g.terminal_color_0 = "#5c5f77"
-vim.g.terminal_color_1 = "#d20f39"
-vim.g.terminal_color_2 = "#40a02b"
-vim.g.terminal_color_3 = "#df8e1d"
-vim.g.terminal_color_4 = "#1e66f5"
-vim.g.terminal_color_5 = "#8839ef"
-vim.g.terminal_color_6 = "#179299"
-vim.g.terminal_color_7 = "#7c7f93" -- overlay2 (darker)
-vim.g.terminal_color_8 = "#6c6f85"
-vim.g.terminal_color_9 = "#d20f39"
-vim.g.terminal_color_10 = "#40a02b"
-vim.g.terminal_color_11 = "#fe640b" -- peach (darker)
-vim.g.terminal_color_12 = "#1e66f5"
-vim.g.terminal_color_13 = "#8839ef"
-vim.g.terminal_color_14 = "#179299"
-vim.g.terminal_color_15 = "#4c4f69"
+return M

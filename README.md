@@ -10,13 +10,10 @@ git clone https://github.com/NILBOGtheSavior/neobog.nvim.git "${XDG_CONFIG_HOME:
 
 - lsp
 - nvim-dap
-- gitsigns.nvim
-- alpha.nvim
 - fidget.nvim
 - lazydev.nvim
 - nvim-colorizer
 - pdf
 - telescope
 - todo-comments
-- which-key
 

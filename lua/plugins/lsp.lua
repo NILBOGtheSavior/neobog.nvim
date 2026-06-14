@@ -2,7 +2,7 @@ local M = {}
 
 function M.setup()
 	vim.diagnostic.config({
-		virtual_text = { prefix = "■", spacing = 4 },
+		virtual_text = { prefix = "", spacing = 4 },
 		float = { border = "single" },
 		signs = true,
 		update_in_insert = false,

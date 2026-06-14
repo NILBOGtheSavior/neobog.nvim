@@ -35,6 +35,10 @@ end)
 -- diagnostics
 
 vim.diagnostic.config({
+	virtual_text = { prefix = " ", spacing = 4 },
+	float = { border = "single" },
+	signs = true,
+	update_in_insert = false,
 	signs = {
 		text = {
 			[vim.diagnostic.severity.ERROR] = "󰅚",

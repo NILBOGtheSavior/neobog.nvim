@@ -1,13 +1,6 @@
 local M = {}
 
 function M.setup()
-	vim.diagnostic.config({
-		virtual_text = { prefix = "", spacing = 4 },
-		float = { border = "single" },
-		signs = true,
-		update_in_insert = false,
-	})
-
 	vim.api.nvim_create_autocmd("LspAttach", {
 		callback = function(args)
 			local bufnr = args.buf

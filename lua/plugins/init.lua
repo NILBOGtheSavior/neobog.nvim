@@ -19,6 +19,7 @@ vim.pack.add({
 	"https://github.com/lewis6991/gitsigns.nvim",
 	"https://github.com/skwee357/nvim-prose",
 	"https://github.com/folke/which-key.nvim",
+	"https://github.com/3rd/image.nvim",
 
 	-- Treesitter
 	{ src = "https://github.com/nvim-treesitter/nvim-treesitter", version = "main" },
@@ -53,6 +54,12 @@ pack.setup({
 		fn = "statusline",
 		event = "UIEnter",
 		packadd = { "lualine.nvim", "nvim-web-devicons", "nvim-prose" },
+	},
+	{
+		mod = "ui",
+		fn = "image",
+		event = "UIEnter",
+		packadd = { "image.nvim" },
 	},
 
 	-- On File

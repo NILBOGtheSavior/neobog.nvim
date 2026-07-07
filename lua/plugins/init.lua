@@ -9,8 +9,8 @@ vim.pack.add({
 	"https://github.com/stevearc/conform.nvim",
 
 	-- Navigation
-    "https://github.com/nvim-lua/plenary.nvim",
-    "https://github.com/MunifTanjim/nui.nvim",
+	"https://github.com/nvim-lua/plenary.nvim",
+	"https://github.com/MunifTanjim/nui.nvim",
 	"https://github.com/nvim-neo-tree/neo-tree.nvim",
 	"https://github.com/nvim-telescope/telescope-fzf-native.nvim",
 	"https://github.com/nvim-telescope/telescope.nvim",
@@ -29,6 +29,11 @@ vim.pack.add({
 	{ src = "https://github.com/nvim-treesitter/nvim-treesitter-textobjects", version = "main" },
 
 	-- Tools (Future: DAP and TESTING)
+	-- Debugging
+	"https://github.com/mfussenegger/nvim-dap",
+	"https://github.com/rcarriga/nvim-dap-ui",
+	"https://github.com/leoluz/nvim-dap-go",
+	"https://github.com/theHamsta/nvim-dap-virtual-text",
 
 	-- LSP
 	"https://github.com/folke/lazydev.nvim",
@@ -104,6 +109,39 @@ pack.setup({
 			{ "<leader>fs", desc = "Select" },
 		},
 		packadd = { "telescope.nvim", "telescope-fzf-native" },
+	},
+
+	{
+		mod = "debug",
+		keys = {
+			{ "<F5>", desc = "Debug Continue" },
+			{ "<F1>", desc = "Debug Step Into" },
+			{ "<F2>", desc = "Debug Step Over" },
+			{ "<F3>", desc = "Debug Step Out" },
+			{ "<F7>", desc = "Debug UI" },
+			{ "<leader>db", desc = "Debug Breakpoint" },
+			{ "<leader>dB", desc = "Debug Conditional BP" },
+			{ "<leader>dx", desc = "Debug Clear BPs" },
+			{ "<leader>dC", desc = "Debug Run to Cursor" },
+			{ "<leader>dl", desc = "Debug Run Last" },
+			{ "<leader>dt", desc = "Debug Terminate" },
+			{ "<leader>dp", desc = "Debug Pause" },
+			{ "<leader>dv", desc = "Debug Hover Toggle" },
+			{ "<leader>dr", desc = "Debug REPL Eval" },
+			{ "<leader>dfc", desc = "Debug Continue" },
+			{ "<leader>dfi", desc = "Debug Step Into" },
+			{ "<leader>dfO", desc = "Debug Step Over" },
+			{ "<leader>dfo", desc = "Debug Step Out" },
+			{ "<leader>dfu", desc = "Debug UI Toggle" },
+			{ "<leader>dir", desc = "Debug REPL" },
+			{ "<leader>dis", desc = "Debug Session" },
+			{ "<leader>diw", desc = "Debug Widget Hover" },
+			{ "<leader>diW", desc = "Debug Widget Scopes" },
+			{ "<leader>diE", desc = "Debug Eval", mode = { "n", "v" } },
+			{ "<leader>dgt", desc = "Debug Go Test" },
+			{ "<leader>dgl", desc = "Debug Go Last Test" },
+		},
+		packadd = { "nvim-dap", "nvim-dap-ui", "nvim-nio", "nvim-dap-go", "nvim-dap-virtual-text" },
 	},
 
 	-- On Call

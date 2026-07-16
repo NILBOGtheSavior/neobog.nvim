@@ -5,11 +5,17 @@ vim.keymap.set("n", "<C-t>", "<cmd>split term:///bin/zsh<CR>i", { desc = "Open t
 vim.keymap.set("t", "<Esc><Esc>", "<C-\\><C-n>", { desc = "Exit terminal mode" })
 vim.keymap.set("n", "<leader>q", vim.diagnostic.setloclist, { desc = "Diagnostics" })
 
--- navigation
+-- window navigation
 vim.keymap.set("n", "<C-h>", "<C-w><C-h>", { desc = "Move focus to the left window" })
 vim.keymap.set("n", "<C-l>", "<C-w><C-l>", { desc = "Move focus to the right window" })
 vim.keymap.set("n", "<C-j>", "<C-w><C-j>", { desc = "Move focus to the lower window" })
 vim.keymap.set("n", "<C-k>", "<C-w><C-k>", { desc = "Move focus to the upper window" })
+
+-- cursor navigation
+vim.keymap.set("i", "<C-h>", "<Left>", { desc = "Move cursor to the left" })
+vim.keymap.set("i", "<C-l>", "<Right>", { desc = "Move cursor to the right" })
+vim.keymap.set("i", "<C-j>", "<Down>", { desc = "Move cursor down" })
+vim.keymap.set("i", "<C-k>", "<Up>", { desc = "Move cursor up" })
 
 -- lazygit
 vim.keymap.set("n", "<leader>gg", native.lazygit, { desc = "Toggle Lazygit" })

@@ -50,7 +50,6 @@ git clone https://github.com/NILBOGtheSavior/neobog.nvim.git "${XDG_CONFIG_HOME:
 
 ## Plugins to add
 
-- [ ] nvim-dap
 - [ ] fidget.nvim
 - [ ] nvim-colorizer
 - [ ] pdf + latex plugins

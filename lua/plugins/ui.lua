@@ -66,15 +66,11 @@ function M.statusline()
 			lualine_x = { "encoding", "filetype" },
 			lualine_y = {
 				{
-					"prose_word_count",
-					cond = function()
-						return vim.tbl_contains(prose_filetypes, vim.bo.filetype)
-					end,
-				},
-				{
-					"progress",
-					cond = function()
-						return not vim.tbl_contains(prose_filetypes, vim.bo.filetype)
+					function()
+						if vim.tbl_contains(prose_filetypes, vim.bo.filetype) then
+							return require("nvim-prose").word_count()
+						end
+						return "progress"
 					end,
 				},
 			},

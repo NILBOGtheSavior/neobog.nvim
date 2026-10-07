@@ -41,6 +41,9 @@ vim.pack.add({
 	-- Utils
 	"https://github.com/saghen/blink.lib",
 	"https://github.com/Saghen/blink.cmp",
+
+	-- Output and Compilation
+	"https://github.com/lervag/vimtex",
 }, { confirm = false, load = function() end })
 
 local pack = require("core.pack")
@@ -150,6 +153,13 @@ pack.setup({
 		fn = "neo_tree",
 		event = "UIEnter",
 		packadd = { "neo-tree.nvim", "nui.nvim", "plenary.nvim" },
+	},
+
+	{
+		mod = "latex",
+		fn = "setup",
+		ft = { "tex", "plaintex", "bib" },
+		packadd = { "vimtex" },
 	},
 
 	-- On Save

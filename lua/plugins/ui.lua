@@ -138,7 +138,19 @@ function M.clue()
 		},
 	})
 	wk.add({
+		{ "<leader>b", group = "Buffers" },
+	})
+	wk.add({
 		{ "<leader>f", group = "Telescope" },
+	})
+	wk.add({
+		{ "<leader>d", group = "Debug" },
+	})
+	wk.add({
+		{ "<leader>g", group = "Git" },
+	})
+	wk.add({
+		{ "<leader>l", group = "LaTeX" },
 	})
 	vim.keymap.set("n", "?", function()
 		wk.show({ global = true })
